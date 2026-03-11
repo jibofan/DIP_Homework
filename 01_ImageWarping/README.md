@@ -1,62 +1,56 @@
-# Assignment 1 - Image Warping
-
-### In this assignment, you will implement basic transformation and point-based deformation for images.
-
-### Resources:
-- [Teaching Slides](https://pan.ustc.edu.cn/share/index/66294554e01948acaf78) 
-- [Paper: Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf)
-- [Paper: Image Warping by Radial Basis Functions](https://www.sci.utah.edu/~gerig/CS6640-F2010/Project3/Arad-1995.pdf)
-- [OpenCV Geometric Transformations](https://docs.opencv.org/4.x/da/d6e/tutorial_py_geometric_transformations.html)
-- [Gradio: 一个好用的网页端交互GUI](https://www.gradio.app/)
-
-### 1. Basic Image Geometric Transformation (Scale/Rotation/Translation).
-Fill the [Missing Part](run_global_transform.py#L21) of 'run_global_transform.py'.
-
-
-### 2. Point Based Image Deformation.
-
-Implement MLS or RBF based image deformation in the [Missing Part](run_point_transform.py#L52) of 'run_point_transform.py'.
-
----
-## 一个作业提交模板 (里面的结果也可参考)
-
-
-## Implementation of Image Geometric Transformation
-
-This repository is Yudong Guo's implementation of Assignment_01 of DIP. 
-
-<img src="pics/teaser.png" alt="alt text" width="800">
+# Assignment1 - ImageWarping
 
 ## Requirements
 
 To install requirements:
 
 ```setup
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
+>📋  Describe how to set up the environment, e.g. pip/conda/docker commands, download datasets, etc...
 
-## Running
+## Training
 
-To run basic transformation, run:
+To train the model(s) in the paper, run this command:
 
-```basic
-python run_global_transform.py
+```train
+python train.py --input-data <path_to_data> --alpha 10 --beta 20
 ```
 
-To run point guided transformation, run:
+>📋  Describe how to train the models, with example commands on how to train the models in your paper, including the full training procedure and appropriate hyperparameters.
 
-```point
-python run_point_transform.py
+## Evaluation
+
+To evaluate my model on ImageNet, run:
+
+```eval
+python eval.py --model-file mymodel.pth --benchmark imagenet
 ```
 
-## Results (need add more result images)
-### Basic Transformation
-<img src="pics/global_demo.gif" alt="alt text" width="800">
+>📋  Describe how to evaluate the trained models on benchmarks reported in the paper, give commands that produce the results (section below).
 
-### Point Guided Deformation:
-<img src="pics/point_demo.gif" alt="alt text" width="800">
+## Pre-trained Models
 
-## Acknowledgement
+You can download pretrained models here:
 
->📋 Thanks for the algorithms proposed by [Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf).
+- [My awesome model](https://drive.google.com/mymodel.pth) trained on ImageNet using parameters x,y,z. 
+
+>📋  Give a link to where/how the pretrained models can be downloaded and how they were trained (if applicable).  Alternatively you can have an additional column in your results table with a link to the models.
+
+## Results
+
+Our model achieves the following performance on :
+
+### [Image Classification on ImageNet](https://paperswithcode.com/sota/image-classification-on-imagenet)
+
+| Model name         | Top 1 Accuracy  | Top 5 Accuracy |
+| ------------------ |---------------- | -------------- |
+| My awesome model   |     85%         |      95%       |
+
+>📋  Include a table of results from your paper, and link back to the leaderboard for clarity and context. If your main result is a figure, include that figure and link to the command or notebook to reproduce it. 
+
+
+## Contributing
+
+>📋  Pick a licence and describe how to contribute to your code repository. .
