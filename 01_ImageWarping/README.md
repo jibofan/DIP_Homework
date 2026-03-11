@@ -24,5 +24,11 @@ python run_point_transform.py
 
 ## Results
 
+### Basic Transformation
+<img src="pics/global.png" alt="alt text" width="800">
+
+### Point Guided Deformation:
+<img src="pics/local.png" alt="alt text" width="800">
+
 ## Contributing
 
