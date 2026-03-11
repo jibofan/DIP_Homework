@@ -30,5 +30,5 @@ python run_point_transform.py
 ### Point Guided Deformation:
 <img src="pics/local.png" alt="alt text" width="800">
 
-## Contributing
+## Acknowledgement
 
