@@ -28,7 +28,7 @@ python run_point_transform.py
 <img src="pics/global.png" alt="alt text" width="800">
 
 ### Point Guided Deformation:
-<img src="pics/local.png" alt="alt text" width="800">
+<img src="pics/point.png" alt="alt text" width="800">
 
 ## Acknowledgement
 >📋 Thanks for the algorithms proposed by [Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf).
