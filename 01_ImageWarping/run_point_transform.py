@@ -47,40 +47,49 @@ def point_guided_deformation(image, source_pts, target_pts, alpha=1.0, eps=1e-8)
         A deformed image.
     """
 
-    warped_image = np.array(image)
-
-    ### FILL: Implement MLS or RBF based image warping
     h, w = image.shape[:2]
-    p = np.array(source_pts).astype(np.float32)
-    q = np.array(target_pts).astype(np.float32)
+    p = np.array(source_pts, dtype=np.float32)
+    q = np.array(target_pts, dtype=np.float32)
 
-    for x in range(w):
-        for y in range(h):
-            # Step1: Calculate dynamic weights
-            v = np.array([x, y], dtype=np.float32)
-            diff = q - v
-            dist2 = np.sum(diff ** 2, axis=1)
-            wi = 1.0 / ((dist2)** alpha + eps)
-            # Step2: Calculate weighted centroids
-            w_sum = np.sum(wi)
-            p_star = np.sum(wi[:, None] * p, axis=0) / w_sum
-            q_star = np.sum(wi[:, None] * q, axis=0) / w_sum
-            # Step3: Switch to relative coordinates
-            p_hat = p - p_star
-            q_hat = q - q_star
-            # Step4: Solve optimal transformation matrix M
-            A = np.zeros((2, 2), dtype=np.float32)
-            B = np.zeros((2, 2), dtype=np.float32)
-            for i in range(len(p)):
-                A += wi[i] * np.outer(q_hat[i], q_hat[i])
-                B += wi[i] * np.outer(p_hat[i], q_hat[i])
-            M = np.linalg.pinv(A) @ B
-            # Step5: Determine final pixel position
-            vs = (v - q_star) @ M + p_star
-            if 0 <= vs[0] < w and 0 <= vs[1] < h:
-                warped_image[y, x] = image[int(vs[1]), int(vs[0])]
-            else:
-                warped_image[y, x] = (255, 255, 255)
+    # Generate pixel grid
+    yy, xx = np.meshgrid(np.arange(h), np.arange(w), indexing='ij')
+    pixels = np.stack([xx, yy], axis=-1).reshape(-1, 2)
+
+    # Step1: Calculate dynamic weights
+    diff = q[None, :, :] - pixels[:, None, :]
+    dist2 = np.sum(diff ** 2, axis=2)
+    wi = 1.0 / (dist2 ** alpha + eps)
+
+    # Step2: Calculate weighted centroids
+    w_sum = wi.sum(axis=1, keepdims=True)
+    p_star = wi @ p / w_sum
+    q_star = wi @ q / w_sum
+
+    # Step3: Switch to relative coordinates
+    p_hat = p[None, :, :] - p_star[:, None, :]
+    q_hat = q[None, :, :] - q_star[:, None, :]
+
+    # Step4: Solve optimal transformation matrix M
+    q_hat_q_hat = q_hat[:, :, :, None] * q_hat[:, :, None, :]
+    p_hat_q_hat = p_hat[:, :, :, None] * q_hat[:, :, None, :]
+    A = np.sum(wi[:, :, None, None] * q_hat_q_hat, axis=1)
+    B = np.sum(wi[:, :, None, None] * p_hat_q_hat, axis=1)
+    M = np.empty_like(A)
+    for i in range(A.shape[0]):
+        M[i] = np.linalg.pinv(A[i]) @ B[i]
+
+    # Step5: Determine final pixel position
+    v_minus_qstar = (pixels - q_star)
+    vs = np.einsum('ij,ijk->ik', v_minus_qstar, M) + p_star
+
+    # Step6: Generate warped image
+    warped_image = np.ones_like(image) * 255
+    valid_mask = (vs[:,0]>=0) & (vs[:,0]<w) & (vs[:,1]>=0) & (vs[:,1]<h)
+    valid_idx = np.where(valid_mask)[0]
+    vs_int = vs[valid_idx].astype(np.int32)
+    src_pixels = pixels[valid_idx]
+    warped_image[src_pixels[:,1], src_pixels[:,0]] = image[vs_int[:,1], vs_int[:,0]]
+
     return warped_image
 
 def run_warping():
