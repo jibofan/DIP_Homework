@@ -12,7 +12,7 @@ def initialize_polygon():
     Returns:
         dict: A dictionary with 'points' and 'closed' status.
     """
-    return {'points': [], 'closed': False} #判断多边形封闭
+    return {'points': [], 'closed': False}
 
 # Add a point to the polygon when the user clicks on the image
 def add_point(img_original, polygon_state, evt: gr.SelectData):
@@ -137,8 +137,8 @@ def cal_laplacian_loss(foreground_img, foreground_mask, blended_img, background_
     conv_kernel = torch.tensor([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=torch.float32, device=foreground_img.device).reshape(1, 1, 3, 3)
     conv_kernel = conv_kernel.repeat(3, 1, 1, 1)
 
-    lap_fg = torch.nn.functional.conv2d(foreground_img, conv_kernel, padding=1, groups=3) # 前景图像lap
-    lap_blended = torch.nn.functional.conv2d(blended_img, conv_kernel, padding=1, groups=3) # 背景图像lap
+    lap_fg = torch.nn.functional.conv2d(foreground_img, conv_kernel, padding=1, groups=3)
+    lap_blended = torch.nn.functional.conv2d(blended_img, conv_kernel, padding=1, groups=3)
 
     fg_mask= foreground_mask.expand(-1, 3, -1, -1).bool()
     bg_mask= background_mask.expand(-1, 3, -1, -1).bool()
