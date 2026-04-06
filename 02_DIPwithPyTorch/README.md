@@ -35,7 +35,7 @@ python train.py
 
 ### Pix2Pix:
 #### Pre-trained models:
-See
+See [Pix2Pix/checkpoints](./Pix2Pix/checkpoints)
 
 #### Training results:
 See
