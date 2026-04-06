@@ -35,13 +35,16 @@ python train.py
 
 ### Pix2Pix:
 #### Pre-trained models:
-See [Pix2Pix/checkpoints](./Pix2Pix/checkpoints)
+See [checkpoints](./Pix2Pix/checkpoints)
 
 #### Training results:
-See
+See [train_results](./Pix2Pix/train_results)
 
 #### Validation results:
-See
+See [val_results](./Pix2Pix/val_results)
 
 ## Acknowledgement
->📋 Thanks for the algorithms proposed by [Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf).
+>📋 Thanks for the algorithms proposed by
+- [Paper: Poisson Image Editing](https://www.cs.jhu.edu/~misha/Fall07/Papers/Perez03.pdf)
+- [Paper: Image-to-Image Translation with Conditional Adversarial Nets](https://phillipi.github.io/pix2pix/)
+- [Paper: Fully Convolutional Networks for Semantic Segmentation](https://arxiv.org/abs/1411.4038)
