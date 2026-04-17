@@ -1,25 +1,3 @@
-"""
-Task 1: Bundle Adjustment from scratch with PyTorch.
-
-Inputs
-------
-- data/points2d.npz        : 50 keys "view_000"~"view_049", each (20000, 3) = (x, y, visibility)
-- data/points3d_colors.npy : (20000, 3) RGB colors in [0, 1] (for OBJ export only)
-
-Outputs
--------
-- outputs/loss_curve.png     : reprojection loss vs. iteration
-- outputs/reconstruction.obj : colored 3D point cloud ("v x y z r g b" per line)
-
-Projection convention (from README)
------------------------------------
-    [Xc, Yc, Zc]^T = R @ [X, Y, Z]^T + T
-    u = -f * Xc / Zc + cx
-    v =  f * Yc / Zc + cy
-The object is near the origin (Z ~= 0), and cameras sit on the +Z side looking
-toward -Z, so T ~= [0, 0, -d] and Zc < 0 for visible points.
-"""
-
 import os
 import math
 import numpy as np
@@ -40,16 +18,15 @@ N_POINTS   = 20000
 
 # ---- optimization ----
 N_ITERS    = 2000
-# Parameter magnitudes differ a lot, so use separate learning rates per group.
-LR_FOCAL   = 10.0    # focal is on the order of ~1000
-LR_EULER   = 1e-2    # radians
+LR_FOCAL   = 10.0
+LR_EULER   = 1e-2
 LR_TRANS   = 1e-2
 LR_POINTS  = 1e-2
 
 # ---- initialization ----
-INIT_FOV_DEG = 50.0  # rough FoV guess, used to derive the initial focal length
-INIT_DEPTH   = 2.5   # T = [0, 0, -d]
-INIT_PT_STD  = 0.1   # std of random init for 3D points
+INIT_FOV_DEG = 50.0
+INIT_DEPTH   = 2.5
+INIT_PT_STD  = 0.1
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -121,7 +98,7 @@ class BundleAdjustment(nn.Module):
         self.eulers = nn.Parameter(torch.zeros(n_views, 3))
 
         T = torch.zeros(n_views, 3)
-        T[:, 2] = -init_depth                       # cameras sit on +Z side and look toward -Z
+        T[:, 2] = -init_depth
         self.trans = nn.Parameter(T)
 
         self.points3d = nn.Parameter(torch.randn(n_points, 3) * init_pt_std)
@@ -134,13 +111,11 @@ class BundleAdjustment(nn.Module):
         uv : (V, N, 2)  predicted pixel coordinates
         Zc : (V, N)     camera-frame depth (useful for sanity checks / masking)
         """
-        R = euler_to_R(self.eulers)                                    # (V, 3, 3)
-        # Xc = R @ X + T, broadcast over N points.
+        R = euler_to_R(self.eulers)
         Xc = torch.einsum("vij,nj->vni", R, self.points3d) \
-             + self.trans.unsqueeze(1)                                 # (V, N, 3)
-        X, Y, Z = Xc.unbind(-1)                                        # each (V, N)
+             + self.trans.unsqueeze(1)
+        X, Y, Z = Xc.unbind(-1)
 
-        # Projection formula from README: u takes a minus sign, v does not.
         u = -self.focal * X / Z + self.cx
         v =  self.focal * Y / Z + self.cy
         return torch.stack([u, v], dim=-1), Z
@@ -155,7 +130,7 @@ def reprojection_loss(pred_uv, obs_uv, vis_mask):
     pred_uv, obs_uv : (V, N, 2)
     vis_mask        : (V, N)      1.0 if the observation is valid
     """
-    diff2 = ((pred_uv - obs_uv) ** 2).sum(dim=-1)   # (V, N)  squared pixel distance
+    diff2 = ((pred_uv - obs_uv) ** 2).sum(dim=-1)
     n_valid = vis_mask.sum().clamp_min(1.0)
     return (diff2 * vis_mask).sum() / n_valid
 
